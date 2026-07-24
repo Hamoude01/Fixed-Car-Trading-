@@ -189,6 +189,40 @@ class Car(CarBase, BaseDocument):
     dateAdded: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
 
+class SubmissionCreate(BaseModel):
+    name: str
+    phone: str
+    email: str
+    make: str
+    model: str
+    year: str = ""
+    mileage: str = ""
+    askingPrice: str = ""
+    county: str = ""
+    description: str = ""
+    images: List[str] = Field(default_factory=list)
+
+
+class Submission(SubmissionCreate, BaseDocument):
+    id: Optional[str] = None
+    status: str = "pending"
+    createdAt: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
+
+class ContactCreate(BaseModel):
+    name: str
+    email: str
+    phone: str = ""
+    subject: str = ""
+    message: str
+
+
+class ContactMessage(ContactCreate, BaseDocument):
+    id: Optional[str] = None
+    status: str = "unread"
+    createdAt: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
+
 # ---------------------------------------------------------------------------
 # Auth routes
 # ---------------------------------------------------------------------------
@@ -321,14 +355,13 @@ def compress_image(data: bytes, ext: str) -> tuple[bytes, str]:
         return data, MIME_TYPES.get(ext, "image/jpeg")
 
 
-@api_router.post("/upload")
-async def upload_images(files: List[UploadFile] = File(...), admin: dict = Depends(get_current_admin)):
+async def store_uploaded_files(files: List[UploadFile], prefix: str) -> List[str]:
     urls = []
     for file in files:
         ext = (file.filename.rsplit(".", 1)[-1] if "." in file.filename else "jpg").lower()
         raw = await file.read()
         data, content_type = compress_image(raw, ext)
-        path = f"{APP_NAME}/cars/{uuid.uuid4()}.jpg"
+        path = f"{APP_NAME}/{prefix}/{uuid.uuid4()}.jpg"
         result = put_object(path, data, content_type)
         stored_path = result["path"]
         await db.files.insert_one({
@@ -340,7 +373,19 @@ async def upload_images(files: List[UploadFile] = File(...), admin: dict = Depen
             "created_at": datetime.now(timezone.utc).isoformat(),
         })
         urls.append(f"/api/files/{stored_path}")
-    return {"urls": urls}
+    return urls
+
+
+@api_router.post("/upload")
+async def upload_images(files: List[UploadFile] = File(...), admin: dict = Depends(get_current_admin)):
+    return {"urls": await store_uploaded_files(files, "cars")}
+
+
+@api_router.post("/submissions/upload")
+async def upload_submission_images(files: List[UploadFile] = File(...)):
+    if len(files) > 12:
+        raise HTTPException(status_code=400, detail="Maximum 12 photos allowed")
+    return {"urls": await store_uploaded_files(files, "submissions")}
 
 
 @api_router.get("/files/{path:path}")
@@ -356,6 +401,101 @@ async def serve_file(path: str):
 @api_router.get("/")
 async def root():
     return {"message": "Car Trading Ireland API"}
+
+
+# ---------------------------------------------------------------------------
+# Sell Your Car submissions (public create, admin manage)
+# ---------------------------------------------------------------------------
+@api_router.post("/submissions", response_model=Submission)
+async def create_submission(body: SubmissionCreate):
+    doc = body.model_dump()
+    doc["status"] = "pending"
+    doc["createdAt"] = datetime.now(timezone.utc).isoformat()
+    res = await db.submissions.insert_one(doc)
+    created = await db.submissions.find_one({"_id": res.inserted_id})
+    return Submission.from_mongo(created)
+
+
+@api_router.get("/submissions", response_model=List[Submission])
+async def list_submissions(status: Optional[str] = None, admin: dict = Depends(get_current_admin)):
+    query = {"status": status} if status else {}
+    docs = await db.submissions.find(query).sort("createdAt", -1).to_list(1000)
+    return [Submission.from_mongo(d) for d in docs]
+
+
+@api_router.patch("/submissions/{sid}/status", response_model=Submission)
+async def update_submission_status(sid: str, status: str = Query(...), admin: dict = Depends(get_current_admin)):
+    if not ObjectId.is_valid(sid):
+        raise HTTPException(status_code=404, detail="Not found")
+    await db.submissions.update_one({"_id": ObjectId(sid)}, {"$set": {"status": status}})
+    doc = await db.submissions.find_one({"_id": ObjectId(sid)})
+    if not doc:
+        raise HTTPException(status_code=404, detail="Not found")
+    return Submission.from_mongo(doc)
+
+
+@api_router.delete("/submissions/{sid}")
+async def delete_submission(sid: str, admin: dict = Depends(get_current_admin)):
+    if not ObjectId.is_valid(sid):
+        raise HTTPException(status_code=404, detail="Not found")
+    await db.submissions.delete_one({"_id": ObjectId(sid)})
+    return {"ok": True}
+
+
+# ---------------------------------------------------------------------------
+# Contact messages (public create, admin manage)
+# ---------------------------------------------------------------------------
+@api_router.post("/contact", response_model=ContactMessage)
+async def create_contact(body: ContactCreate):
+    doc = body.model_dump()
+    doc["status"] = "unread"
+    doc["createdAt"] = datetime.now(timezone.utc).isoformat()
+    res = await db.contact_messages.insert_one(doc)
+    created = await db.contact_messages.find_one({"_id": res.inserted_id})
+    return ContactMessage.from_mongo(created)
+
+
+@api_router.get("/contact", response_model=List[ContactMessage])
+async def list_contact(admin: dict = Depends(get_current_admin)):
+    docs = await db.contact_messages.find({}).sort("createdAt", -1).to_list(1000)
+    return [ContactMessage.from_mongo(d) for d in docs]
+
+
+@api_router.patch("/contact/{cid}/status", response_model=ContactMessage)
+async def update_contact_status(cid: str, status: str = Query(...), admin: dict = Depends(get_current_admin)):
+    if not ObjectId.is_valid(cid):
+        raise HTTPException(status_code=404, detail="Not found")
+    await db.contact_messages.update_one({"_id": ObjectId(cid)}, {"$set": {"status": status}})
+    doc = await db.contact_messages.find_one({"_id": ObjectId(cid)})
+    if not doc:
+        raise HTTPException(status_code=404, detail="Not found")
+    return ContactMessage.from_mongo(doc)
+
+
+@api_router.delete("/contact/{cid}")
+async def delete_contact(cid: str, admin: dict = Depends(get_current_admin)):
+    if not ObjectId.is_valid(cid):
+        raise HTTPException(status_code=404, detail="Not found")
+    await db.contact_messages.delete_one({"_id": ObjectId(cid)})
+    return {"ok": True}
+
+
+# ---------------------------------------------------------------------------
+# Admin dashboard stats
+# ---------------------------------------------------------------------------
+@api_router.get("/admin/stats")
+async def admin_stats(admin: dict = Depends(get_current_admin)):
+    cars = await db.cars.find({}, {"price": 1, "featured": 1}).to_list(2000)
+    total_value = sum(float(c.get("price") or 0) for c in cars)
+    return {
+        "totalListings": len(cars),
+        "featured": sum(1 for c in cars if c.get("featured")),
+        "inventoryValue": total_value,
+        "pendingSubmissions": await db.submissions.count_documents({"status": "pending"}),
+        "totalSubmissions": await db.submissions.count_documents({}),
+        "unreadMessages": await db.contact_messages.count_documents({"status": "unread"}),
+        "totalMessages": await db.contact_messages.count_documents({}),
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -388,6 +528,9 @@ async def startup():
     await db.cars.create_index("model")
     await db.cars.create_index("county")
     await db.cars.create_index("dateAdded")
+    await db.submissions.create_index("status")
+    await db.submissions.create_index("createdAt")
+    await db.contact_messages.create_index("status")
 
     if await db.cars.count_documents({}) == 0:
         await seed_cars()

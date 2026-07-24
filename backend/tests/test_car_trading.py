@@ -208,3 +208,136 @@ def test_create_update_delete_car(s, auth_headers, uploaded_urls):
 
     r7 = s.get(f"{API}/cars/{car_id}", timeout=30)
     assert r7.status_code == 404
+
+
+
+# ------------ submissions (public create, admin manage) ------------
+@pytest.fixture(scope="session")
+def submission_upload_urls(s):
+    files = [
+        ("files", ("s1.jpg", _make_jpeg_bytes((0, 0, 255)), "image/jpeg")),
+    ]
+    r = requests.post(f"{API}/submissions/upload", files=files, timeout=120)
+    assert r.status_code == 200, f"public sub upload failed {r.status_code} {r.text}"
+    urls = r.json()["urls"]
+    assert len(urls) == 1 and urls[0].startswith("/api/files/")
+    return urls
+
+
+def test_public_submission_upload_no_auth(submission_upload_urls):
+    # Publicly servable
+    r = requests.get(f"{BASE_URL}{submission_upload_urls[0]}", timeout=60)
+    assert r.status_code == 200
+    assert r.headers.get("Content-Type", "").startswith("image/")
+
+
+def test_create_submission_public(s, submission_upload_urls, auth_headers):
+    payload = {
+        "name": "TEST_John Doe", "phone": "0871234567", "email": "test_john@example.com",
+        "make": "Audi", "model": "A4", "year": "2019", "mileage": "60000",
+        "askingPrice": "18000", "county": "Dublin", "description": "Great car",
+        "images": submission_upload_urls,
+    }
+    r = requests.post(f"{API}/submissions", json=payload, timeout=30)
+    assert r.status_code == 200, r.text
+    sub = r.json()
+    assert "id" in sub and "_id" not in sub
+    assert sub["status"] == "pending"
+    assert sub["images"] == submission_upload_urls
+    sid = sub["id"]
+
+    # list requires auth
+    r_noauth = requests.get(f"{API}/submissions", timeout=30)
+    assert r_noauth.status_code == 401
+
+    # list with auth includes it
+    r_list = s.get(f"{API}/submissions", headers=auth_headers, timeout=30)
+    assert r_list.status_code == 200
+    ids = [x["id"] for x in r_list.json()]
+    assert sid in ids
+
+    # filter pending
+    r_pending = s.get(f"{API}/submissions", params={"status": "pending"}, headers=auth_headers, timeout=30)
+    assert r_pending.status_code == 200
+    assert all(x["status"] == "pending" for x in r_pending.json())
+
+    # status update requires auth
+    r_noauth2 = requests.patch(f"{API}/submissions/{sid}/status", params={"status": "reviewed"}, timeout=30)
+    assert r_noauth2.status_code == 401
+
+    # mark reviewed
+    r_upd = s.patch(f"{API}/submissions/{sid}/status", params={"status": "reviewed"}, headers=auth_headers, timeout=30)
+    assert r_upd.status_code == 200
+    assert r_upd.json()["status"] == "reviewed"
+
+    # mark accepted
+    r_upd2 = s.patch(f"{API}/submissions/{sid}/status", params={"status": "accepted"}, headers=auth_headers, timeout=30)
+    assert r_upd2.json()["status"] == "accepted"
+
+    # delete requires auth
+    r_del_noauth = requests.delete(f"{API}/submissions/{sid}", timeout=30)
+    assert r_del_noauth.status_code == 401
+
+    r_del = s.delete(f"{API}/submissions/{sid}", headers=auth_headers, timeout=30)
+    assert r_del.status_code == 200
+
+
+def test_submissions_upload_too_many():
+    files = [("files", (f"{i}.jpg", _make_jpeg_bytes((i * 10 % 255, 0, 0)), "image/jpeg")) for i in range(13)]
+    r = requests.post(f"{API}/submissions/upload", files=files, timeout=120)
+    assert r.status_code == 400
+
+
+# ------------ contact (public create, admin manage) ------------
+def test_create_contact_public(s, auth_headers):
+    payload = {
+        "name": "TEST_Jane", "email": "test_jane@example.com", "phone": "0899999999",
+        "subject": "Question", "message": "Hello, I am interested in a listing.",
+    }
+    r = requests.post(f"{API}/contact", json=payload, timeout=30)
+    assert r.status_code == 200, r.text
+    msg = r.json()
+    assert "id" in msg and "_id" not in msg
+    assert msg["status"] == "unread"
+    cid = msg["id"]
+
+    # list requires auth
+    r_noauth = requests.get(f"{API}/contact", timeout=30)
+    assert r_noauth.status_code == 401
+
+    r_list = s.get(f"{API}/contact", headers=auth_headers, timeout=30)
+    assert r_list.status_code == 200
+    assert cid in [x["id"] for x in r_list.json()]
+
+    # mark read
+    r_noauth2 = requests.patch(f"{API}/contact/{cid}/status", params={"status": "read"}, timeout=30)
+    assert r_noauth2.status_code == 401
+
+    r_upd = s.patch(f"{API}/contact/{cid}/status", params={"status": "read"}, headers=auth_headers, timeout=30)
+    assert r_upd.status_code == 200
+    assert r_upd.json()["status"] == "read"
+
+    # delete requires auth
+    r_del_noauth = requests.delete(f"{API}/contact/{cid}", timeout=30)
+    assert r_del_noauth.status_code == 401
+    r_del = s.delete(f"{API}/contact/{cid}", headers=auth_headers, timeout=30)
+    assert r_del.status_code == 200
+
+
+# ------------ admin stats ------------
+def test_admin_stats_requires_auth():
+    r = requests.get(f"{API}/admin/stats", timeout=30)
+    assert r.status_code == 401
+
+
+def test_admin_stats_shape(s, auth_headers):
+    r = s.get(f"{API}/admin/stats", headers=auth_headers, timeout=30)
+    assert r.status_code == 200
+    data = r.json()
+    for key in ["totalListings", "inventoryValue", "pendingSubmissions", "unreadMessages"]:
+        assert key in data, f"missing key {key}"
+    assert isinstance(data["totalListings"], int)
+    assert data["totalListings"] >= 0
+    assert isinstance(data["inventoryValue"], (int, float))
+    assert isinstance(data["pendingSubmissions"], int)
+    assert isinstance(data["unreadMessages"], int)
