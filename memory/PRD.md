@@ -21,18 +21,18 @@ rebuilt to target stack React + FastAPI + MongoDB + Object Storage.
 - Performance: image compression, lazy loading, immutable cache headers, indexes on price/make/model/county/dateAdded.
 
 ## Implemented (2026-07-24)
-- Phase 1–2: Object storage + clean public URLs, `images` array on listing model, public grid gallery. DONE.
-- Phase 3: Admin multi-photo upload with preview grid, reorder (drag), set-cover, delete. DONE.
-- Phase 4: Standardized code structure (lib/, context/, pages/, components/), Pillow compression, lazy loading, DB indexes. DONE.
-- Phase 5: Backend 17/17 pytest passed; frontend Playwright e2e passed. Image bug fix verified end-to-end.
-- Auth: JWT admin (admin@hamoudecartrade.ie / hamoude2024), seeded on startup.
-- Seed: 4 sample cars with images.
+- Phase 1–5 (image bug, multi-photo, refactor, indexes, tested). DONE.
+- Premium "Obsidian & Champagne" dark-luxe redesign across public site + admin.
+- Customer "Sell Your Car" submission flow (PUBLIC, no login) with multi-photo upload → lands in admin Sell Requests inbox.
+- Public Contact form → admin Messages inbox.
+- Owner-only admin command-center (sidebar): Overview (stats), Listings CRUD, Sell Requests (status workflow + detail drawer), Messages (unread/read). Sidebar badges for pending/unread.
+- AUTH MODEL: single owner/admin login at /admin/login ONLY. Customers never log in.
+- Tests: backend 23/23 pytest passed; frontend 5/5 flows passed. Zero open issues.
 
 ## Backlog / Remaining
-- P1: "Sell your car" submission form + contact messages (existed in original Next.js repo; not yet ported).
-- P2: Per-field data-testids on CarForm text inputs; server-side required-field/year validators.
-- P2: Restrict CORS origins; split server.py into route modules if it grows.
-- P2: Responsive image sizes (srcset) / thumbnail variants.
+- P2: Email/SMS notification to owner on new sell request (needs SendGrid/Twilio integration).
+- P2: One-click "Publish submission as listing" (convert accepted sell request → car listing).
+- P2: Loading skeletons on admin overview; pagination as inventory grows.
 
 ## Next Tasks
 - Port seller submission + contact inbox to admin, or add pagination/favorites as inventory grows.
