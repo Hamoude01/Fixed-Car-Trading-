@@ -1,120 +1,108 @@
 {
-  "theme": "light",
-  "typography": {
-    "heading_font": "Outfit",
-    "body_font": "Manrope",
-    "mono_font": "JetBrains Mono",
-    "hierarchy": {
-      "h1": "text-5xl sm:text-6xl tracking-tighter font-semibold",
-      "h2": "text-3xl sm:text-4xl tracking-tight font-medium",
-      "h3": "text-xl sm:text-2xl tracking-tight font-medium",
-      "body": "text-base leading-relaxed text-zinc-600",
-      "label": "text-xs tracking-[0.2em] uppercase font-bold text-zinc-500"
-    },
-    "rules": "Never use Inter for headings. Keep tight tracking for large headings. Use wide tracking for small overlines/labels. Embrace 'Swiss Brutalist' clarity for automotive details."
-  },
+  "theme": "dark",
+  "archetype": "Archetype 5 (Luxury - Premium, Depth, Mystery) combined with High-Contrast Swiss",
   "colors": {
-    "archetype": "Swiss & High-Contrast (Automotive Variant)",
-    "palette": {
-      "background": "#F9FAFB",
-      "surface": "#FFFFFF",
-      "primary": "#0A0A0A",
-      "primary_foreground": "#FFFFFF",
-      "accent": "#10B981",
-      "accent_foreground": "#FFFFFF",
-      "muted": "#F3F4F6",
-      "muted_foreground": "#6B7280",
-      "border": "#E5E7EB",
-      "destructive": "#EF4444"
-    },
-    "rules": "Rely on high contrast. The UI should be predominantly monochrome (black, white, cold grays) with the accent color (Emerald Green #10B981) used strictly for primary call-to-actions, successful states, and pricing highlights to evoke trust. Ensure 4.5:1 contrast minimum for text."
+    "background": "#050505",
+    "surface": "#121212",
+    "surface_elevated": "#1A1A1A",
+    "primary": "#F9F9F9",
+    "primary_foreground": "#050505",
+    "accent": "#C5A880",
+    "accent_hover": "#E0C39C",
+    "muted": "#2B2B2B",
+    "muted_foreground": "#888888",
+    "border": "#2B2B2B",
+    "destructive": "#FF3B30",
+    "success": "#34C759",
+    "notes": "Transitioning away from the generic emerald green to a deeply cinematic 'Obsidian & Champagne' luxury palette. Colors must remain strictly high-contrast. Never use pure #000000; use #050505 (deepest charcoal/void) for backgrounds."
   },
-  "layouts": {
-    "marketplace": "Bento-grid inspired inventory cards. 1px subtle borders. Wide padding on containers (p-8 to p-12). Left-align data for easy scanning.",
-    "admin_dashboard": "High-density grid layout. Sidebar navigation. Tables with tight padding, flat rectangular cards, subtle 1px border. No floating soft shadows here.",
-    "car_detail": "Editorial style layout. Large immersive multi-image grid gallery at the top (e.g. 1 hero image left, 2 stacked right). Sticky specs and contact column on desktop."
+  "typography": {
+    "headings": {
+      "family": "Outfit",
+      "weights": ["300 (Light)", "700 (Bold)"],
+      "usage": "Use tight letter spacing (tracking-tight or tracking-tighter). Avoid standard 'Bold' everywhere—use Light for elegant over-sized text and Black/Bold for impactful words.",
+      "sizes": {
+        "h1": "text-5xl sm:text-6xl+",
+        "h2": "text-3xl sm:text-4xl",
+        "h3": "text-xl sm:text-2xl"
+      }
+    },
+    "body": {
+      "family": "Manrope",
+      "weights": ["400 (Regular)", "500 (Medium)"],
+      "usage": "Clean, highly readable geometric body copy."
+    },
+    "mono": {
+      "family": "JetBrains Mono",
+      "usage": "For VIN numbers, pricing, specs, and dashboard metrics."
+    },
+    "labels": {
+      "style": "uppercase, text-xs, tracking-[0.2em], text-muted-foreground, font-bold",
+      "usage": "Overlines above headings, table column headers, form labels."
+    }
   },
   "visual_enhancers": {
-    "surfaces": "Use 'Neumorphism Crisp' – sharp 1px borders (border-black/5) with subtle drop shadows (shadow-sm) on white cards. Never apply one style globally.",
-    "glassmorphism": "For sticky navigation or filter bars, use backdrop-blur-xl bg-white/70 with a 1px border-b border-black/5.",
-    "hover_states": "Interactive cards should slightly lift (-translate-y-1) and shadow increase (shadow-md) on hover. Buttons should dim or change text color explicitly."
+    "gradients": "No generic full-screen gradients. Use extreme low-opacity radial glows (#C5A880/5) purely to highlight specific UI elements like featured car cards.",
+    "textures": "Use CSS noise or subtle grain overlays to prevent digital flatness. Gives a physical 'showroom' or 'matte paint' feel.",
+    "glassmorphism": "Used strictly for the sticky header and floating action bars. Must use backdrop-blur-xl, bg-black/60, and a delicate border-white/10 to create 'milled crystal' optics. No muddy grays.",
+    "borders": "Expose the skeleton. Use 1px solid borders (border-border) everywhere to maintain a rigid, technical, yet premium feel."
+  },
+  "layouts": {
+    "public_site": {
+      "hero": "Cinematic. 100vh or max-h-[800px]. Full bleed image with bg-black/40 to bg-black/60 overlay. Text must be legible. H1 should not exceed text-6xl.",
+      "grids": "Use 'Bento Grid' (Mode A: Asymmetry). Wide gaps (gap-8). Feature the hero car in col-span-8, supporting details in col-span-4.",
+      "cards": "Flat surfaces with 1px border. On hover: slight lift (-translate-y-1), subtle ambient shadow, and border color lightens to border-white/20.",
+      "spacing": "Generous spacing. py-24 or py-32 for sections."
+    },
+    "admin_dashboard": {
+      "layout": "F-Pattern High-Density Layout. Collapsible left sidebar navigation (bg-surface).",
+      "metrics": "Top row should be metric cards (MRR, Total Listings, Submissions).",
+      "tables": "Data-heavy, high contrast. Use Shadcn tables with sticky headers. Text sizes text-sm. Mono font for IDs/prices.",
+      "spacing": "Tight spacing (gap-4 or gap-6). Utilize all pixels. Height-full on children.",
+      "cards": "Subtle roundness (max 8px). 1px border. No shadows."
+    }
   },
   "components": {
-    "buttons": "Slightly rounded (rounded-lg) for a modern, trustworthy feel. Active states must be visibly differentiated.",
-    "cards": "Subtle border (border-zinc-200), white background, zero to minimal shadow until hovered.",
-    "inputs": "Shadcn defaults but customize via Tailwind: rounded-md, bg-white, border-zinc-200. Focus ring must be the primary color (#0A0A0A).",
-    "car_gallery": "Simple CSS Grid for images. First image spans 2 columns/2 rows, next 2 images span 1 column/1 row.",
-    "multi_photo_upload": "Admin image upload needs visual grid for previews, drag-and-drop indicator, and individual 'remove' buttons per thumbnail."
+    "buttons": "Sharp edges or minimal radius (rounded-sm). Primary button uses the Champagne accent (bg-accent text-primary-foreground). Hover state must be lighter.",
+    "forms": "Never use native HTML inputs. Use Shadcn Input, Select, Textarea. Inputs should have bg-surface, border-border, focus:ring-1 focus:ring-accent focus:border-accent.",
+    "tabs_and_pills": "Use for filtering listings (All, SUVs, Coupes). Override Shadcn tab list fixed heights to h-auto.",
+    "toasts": "Use Sonner. Ensure toast backgrounds match the dark luxury theme (bg-surface, border-border, text-primary)."
   },
   "motion": {
-    "page_transitions": "Use Framer Motion for soft fade-ins and staggered list reveal for car listing grids.",
-    "micro_interactions": "Smooth transition (duration-200 ease-out) on all interactive elements. Avoid 'transition-all'."
+    "hover_states": "All interactive elements MUST have transition-colors duration-200. Cards need transition-transform duration-300.",
+    "entrances": "Staggered fade-up for vehicle listings. Page transitions should be smooth.",
+    "marquee": "Use react-fast-marquee for an 'Editorial Ribbon' of luxury brands (e.g., Porsche • Mercedes-Benz • Audi • BMW) moving slowly across a section."
   },
-  "image_urls": {
-    "hero_banners": [
-      {
-        "url": "https://images.pexels.com/photos/17339323/pexels-photo-17339323.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
-        "description": "Luxury car interior displaying sophisticated steering wheel"
-      },
-      {
-        "url": "https://images.pexels.com/photos/3470473/pexels-photo-3470473.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
-        "description": "Empty road stretching into the horizon in Ireland"
-      }
-    ],
-    "listings": [
-      {
-        "url": "https://images.unsplash.com/photo-1778943242936-7e93c588ad77?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxODd8MHwxfHNlYXJjaHwyfHxzdXYlMjBwYXJrZWQlMjBvdXRkb29yfGVufDB8fHx8MTc4NDkwMTgyMnww&ixlib=rb-4.1.0&q=85",
-        "description": "Black SUV parked"
-      },
-      {
-        "url": "https://images.unsplash.com/photo-1783944361075-b8ad4eabe72f?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxODd8MHwxfHNlYXJjaHw0fHxzdXYlMjBwYXJrZWQlMjBvdXRkb29yfGVufDB8fHx8MTc4NDkwMTgyMnww&ixlib=rb-4.1.0&q=85",
-        "description": "White SUV parked at night"
-      },
-      {
-        "url": "https://images.unsplash.com/photo-1681167816895-940c56e0d2a5?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzd8MHwxfHNlYXJjaHwzfHxsdXh1cnklMjBzZWRhbiUyMGNhciUyMHBhcmtlZHxlbnwwfHx8fDE3ODQ5MDE4Mzl8MA&ixlib=rb-4.1.0&q=85",
-        "description": "Black Rolls Royce parked"
-      },
-      {
-        "url": "https://images.unsplash.com/photo-1610099610040-ab19f3a5ec35?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzd8MHwxfHNlYXJjaHwyfHxsdXh1cnklMjBzZWRhbiUyMGNhciUyMHBhcmtlZHxlbnwwfHx8fDE3ODQ5MDE4Mzl8MA&ixlib=rb-4.1.0&q=85",
-        "description": "Black BMW M3 parked"
-      }
-    ],
-    "avatars": [
-      {
-        "url": "https://images.pexels.com/photos/29852895/pexels-photo-29852895.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
-        "description": "Confident African woman in black suit"
-      },
-      {
-        "url": "https://images.pexels.com/photos/3778603/pexels-photo-3778603.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
-        "description": "Smiling businessman in a suit"
-      }
-    ]
+  "accessibility": {
+    "contrast": "Ensure all text over images uses text-shadow or a gradient overlay behind the text. Gray text must meet 4.5:1 ratio.",
+    "focus": "All interactive elements must have visible focus rings (focus:ring-2 focus:ring-accent focus:outline-none).",
+    "testing": "All interactive elements MUST include a data-testid attribute (e.g., data-testid='submit-car-button')."
   },
-  "icons_library": "lucide-react",
-  "accessibility": "Ensure high contrast. Use data-testid on all interactive elements (e.g. data-testid='filter-button'). Provide aria-labels for icon-only buttons. Do not rely solely on color to convey state changes.",
+  "media": {
+    "images": {
+      "hero_main": "https://images.pexels.com/photos/8359715/pexels-photo-8359715.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "hero_alt": "https://images.unsplash.com/photo-1756990683708-afd38ed20f1f?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NzV8MHwxfHNlYXJjaHw0fHxsdXh1cnklMjBzcG9ydHMlMjBjYXIlMjBzdHVkaW8lMjBsaWdodGluZ3xlbnwwfHx8fDE3ODQ5MzYxMzR8MA&ixlib=rb-4.1.0&q=85",
+      "suv_featured": "https://images.unsplash.com/photo-1752591867269-ef4d8f9cf238?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NTJ8MHwxfHNlYXJjaHwzfHxwcmVtaXVtJTIwc3V2JTIwb3V0ZG9vcnMlMjBzdW5zZXR8ZW58MHx8fHwxNzg0OTM2MTM0fDA&ixlib=rb-4.1.0&q=85",
+      "showroom_interior": "https://images.pexels.com/photos/16176576/pexels-photo-16176576.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "sedan_dark": "https://images.unsplash.com/photo-1485291571150-772bcfc10da5?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NzV8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBzcG9ydHMlMjBjYXIlMjBzdHVkaW8lMjBsaWdodGluZ3xlbnwwfHx8fDE3ODQ5MzYxMzR8MA&ixlib=rb-4.1.0&q=85",
+      "note": "Use these strictly for hero images, placeholder car listings, and section backgrounds. Do not use placehold.it."
+    },
+    "icons": "lucide-react"
+  },
   "instructions_to_main_agent": [
-    "Prioritize building the public UI with custom HTML/Tailwind for artistic control, using Shadcn JS selectively for interactive logic (Modals, Dropdowns).",
-    "For the Admin dashboard, leverage Shadcn components heavily to maintain a dense, data-rich, and functional aesthetic.",
-    "Implement a robust multi-image grid on the Car Details page. Do not just use a carousel; prioritize the grid view.",
-    "Admin upload component must visually support previewing multiple selected photos with a simple reorder or delete option.",
-    "Use standard fetch API or Axios for API integration. The backend is FastAPI and MongoDB."
+    "Read this JSON and implement a highly polished, cinematic 'dark-luxe' UI.",
+    "Do NOT use standard Shadcn colors; override CSS variables to match the colors listed here (#050505 bg, #121212 surface, #C5A880 accent).",
+    "Make the Admin Dashboard feel like a high-end command center. Use the 'F-Pattern' layout with a sidebar and dense data grids.",
+    "In the public site, ensure hero images have a bg-black/50 overlay so the Outfit typography pops.",
+    "Add data-testid attributes to all form elements, buttons, and critical links."
   ],
   "UNIVERSAL_GUIDELINES_FOR_MAIN_AGENT": [
-    "You tend to converge toward generic, 'on distribution' outputs. In frontend design, this creates what users call the 'AI slop' aesthetic. Avoid this: make creative, distinctive frontends that surprise and delight.",
-    "Dark colors look good when used independently without gradients. DO NOT use dark colors as gradients.",
-    "Don't make generic centered layouts, simplistic gradients, and uniform styling.",
-    "Create depth through layered design elements with z-index hierarchy.",
-    "Use glass-morphism effects with backdrop filters (12-24px blur).",
-    "You MUST NOT apply universal transition. Eg: transition: all. This results in breaking transforms. Always add transitions for specific interactive elements like button, input excluding transforms.",
-    "You MUST NOT center align the app container, ie do not add .App { text-align: center; } in the css file. This disrupts the human natural reading flow of text.",
-    "Always use modern button styles like pill-shaped, or sharp button with interaction animations & color relevant to the app style.",
-    "NEVER: use AI assistant Emoji characters like 🤖🧠💭💡🔮🎯 etc for icons.",
-    "Every interaction needs micro-animations - hover states, transitions, parallax effects, and entrance animations. Static = dead.",
-    "Use 2-3x more spacing than feels comfortable. Cramped designs look cheap.",
-    "Subtle grain textures, noise overlays, custom cursors, selection states, and loading animations: separates good from extraordinary.",
-    "Main agent relies on these image URLs. Missing categories (especially sponsor logos) = main agent will use placeholder text which is FORBIDDEN.",
-    "Prioritize using pre-existing components from src/components/ui when applicable.",
-    "Create new components that match the style and conventions of existing components when needed.",
-    "Use sonner for toasts, located in /app/frontend/src/components/ui/sonner.js."
+    "Avoid the 'AI slop' aesthetic. Do not center everything. Use asymmetry.",
+    "Do not apply `transition: all`. Target specific properties.",
+    "Layered design elements with z-index hierarchy.",
+    "Use glass-morphism effects with backdrop filters (12-24px blur) for sticky navs.",
+    "Use modern button styles (sharp or rounded-sm) with interaction animations.",
+    "NEVER use emoji characters for icons. Use lucide-react.",
+    "Every interaction needs micro-animations (hover states, focus rings)."
   ]
 }
