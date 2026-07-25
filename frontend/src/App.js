@@ -4,6 +4,7 @@ import { Toaster } from "sonner";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import FloatingWhatsApp from "./components/FloatingWhatsApp";
 import AdminLayout from "./components/AdminLayout";
 import Home from "./pages/Home";
 import Browse from "./pages/Browse";
@@ -29,6 +30,7 @@ const PublicLayout = ({ children }) => (
     <Header />
     <main className="min-h-screen relative z-[2]">{children}</main>
     <Footer />
+    <FloatingWhatsApp />
   </div>
 );
 

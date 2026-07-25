@@ -3,6 +3,8 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, Gauge, Fuel, Settings, MapPin, Calendar, Palette, DoorOpen, Phone, Mail, Check } from "lucide-react";
 import { api, imageUrl, euro, km } from "../lib/api";
 import { PLACEHOLDER } from "../lib/data";
+import { SITE } from "../lib/site";
+import { WhatsAppIcon } from "../components/SocialLinks";
 
 const Spec = ({ icon: Icon, label, value }) => (
   <div className="flex items-center gap-3 py-3 border-b border-[#2B2B2B] last:border-0">
@@ -96,11 +98,15 @@ export default function CarDetail() {
             <Spec icon={MapPin} label="County" value={car.county} />
           </div>
 
-          <a href="tel:+35312345678" data-testid="call-btn"
+          <a href={`tel:${SITE.phoneTel}`} data-testid="call-btn"
             className="flex items-center justify-center gap-2 w-full py-4 rounded-sm bg-[#C5A880] text-[#050505] font-semibold hover:bg-[#E0C39C] transition-colors mb-3">
-            <Phone size={17} /> Call about this car
+            <Phone size={17} /> Call {SITE.phoneDisplay}
           </a>
-          <a href="mailto:sales@hamoudecartrade.ie" data-testid="email-btn"
+          <a href={`${SITE.whatsapp}&text=${encodeURIComponent("Hi, I'm interested in the " + car.title)}`} target="_blank" rel="noreferrer" data-testid="whatsapp-btn"
+            className="flex items-center justify-center gap-2 w-full py-4 rounded-sm bg-[#25D366] text-[#050505] font-semibold hover:opacity-90 transition-opacity mb-3">
+            <WhatsAppIcon size={18} /> WhatsApp enquiry
+          </a>
+          <a href={`mailto:${SITE.email}?subject=${encodeURIComponent("Enquiry: " + car.title)}`} data-testid="email-btn"
             className="flex items-center justify-center gap-2 w-full py-4 rounded-sm border border-white/20 text-[#F9F9F9] font-semibold hover:bg-white/5 transition-colors">
             <Mail size={17} /> Email enquiry
           </a>

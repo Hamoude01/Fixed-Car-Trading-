@@ -1,7 +1,9 @@
 import { useState } from "react";
-import { CheckCircle2, MapPin, Phone, Mail, Send } from "lucide-react";
+import { CheckCircle2, MapPin, Phone, Mail, Send, Globe } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "../lib/api";
+import { SITE } from "../lib/site";
+import SocialLinks, { WhatsAppIcon } from "../components/SocialLinks";
 
 const inputCls = "w-full h-11 px-3 rounded-sm border border-[#2B2B2B] bg-[#121212] text-sm text-[#F9F9F9] focus:outline-none focus:ring-1 focus:ring-[#C5A880] focus:border-[#C5A880] transition-colors";
 
@@ -35,9 +37,18 @@ export default function Contact() {
           <h1 className="font-heading text-4xl sm:text-5xl tracking-tighter font-light leading-[1.05]">Let's talk <span className="text-[#C5A880]">cars.</span></h1>
           <p className="text-[#888] mt-5 leading-relaxed max-w-md">Questions about a listing, a trade-in, or anything else? Send us a message and we'll get right back to you.</p>
           <div className="mt-10 space-y-5">
-            <div className="flex items-center gap-4"><span className="grid place-items-center w-10 h-10 rounded-sm bg-[#1A1A1A] text-[#C5A880]"><MapPin size={18} /></span><span className="text-[#ccc]">Dublin, Ireland</span></div>
-            <div className="flex items-center gap-4"><span className="grid place-items-center w-10 h-10 rounded-sm bg-[#1A1A1A] text-[#C5A880]"><Phone size={18} /></span><a href="tel:+35312345678" className="text-[#ccc] hover:text-[#C5A880] transition-colors">+353 1 234 5678</a></div>
-            <div className="flex items-center gap-4"><span className="grid place-items-center w-10 h-10 rounded-sm bg-[#1A1A1A] text-[#C5A880]"><Mail size={18} /></span><a href="mailto:sales@hamoudecartrade.ie" className="text-[#ccc] hover:text-[#C5A880] transition-colors">sales@hamoudecartrade.ie</a></div>
+            <div className="flex items-center gap-4"><span className="grid place-items-center w-10 h-10 rounded-sm bg-[#1A1A1A] text-[#C5A880]"><MapPin size={18} /></span><span className="text-[#ccc]">{SITE.address}</span></div>
+            <div className="flex items-center gap-4"><span className="grid place-items-center w-10 h-10 rounded-sm bg-[#1A1A1A] text-[#C5A880]"><Phone size={18} /></span><a href={`tel:${SITE.phoneTel}`} className="text-[#ccc] hover:text-[#C5A880] transition-colors">{SITE.phoneDisplay}</a></div>
+            <div className="flex items-center gap-4"><span className="grid place-items-center w-10 h-10 rounded-sm bg-[#1A1A1A] text-[#C5A880]"><Mail size={18} /></span><a href={`mailto:${SITE.email}`} className="text-[#ccc] hover:text-[#C5A880] transition-colors break-all">{SITE.email}</a></div>
+            <div className="flex items-center gap-4"><span className="grid place-items-center w-10 h-10 rounded-sm bg-[#1A1A1A] text-[#C5A880]"><Globe size={18} /></span><a href={SITE.website} target="_blank" rel="noreferrer" className="text-[#ccc] hover:text-[#C5A880] transition-colors">{SITE.websiteLabel}</a></div>
+          </div>
+          <a href={SITE.whatsapp} target="_blank" rel="noreferrer" data-testid="contact-whatsapp"
+            className="mt-8 inline-flex items-center gap-2.5 px-6 py-3.5 rounded-sm bg-[#25D366] text-[#050505] font-semibold hover:opacity-90 transition-opacity">
+            <WhatsAppIcon size={19} /> Message on WhatsApp
+          </a>
+          <div className="mt-8">
+            <p className="overline mb-3 text-[#888]">Follow us</p>
+            <SocialLinks />
           </div>
         </div>
 
