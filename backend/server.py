@@ -178,6 +178,7 @@ class CarBase(BaseModel):
     features: List[str] = Field(default_factory=list)
     images: List[str] = Field(default_factory=list)
     featured: bool = False
+    status: str = "available"  # "available" | "sold"
 
 
 class CarCreate(CarBase):
@@ -333,6 +334,19 @@ async def delete_car(car_id: str, admin: dict = Depends(get_current_admin)):
         raise HTTPException(status_code=404, detail="Car not found")
     await db.cars.delete_one({"_id": ObjectId(car_id)})
     return {"ok": True}
+
+
+@api_router.patch("/cars/{car_id}/status", response_model=Car)
+async def update_car_status(car_id: str, status: str = Query(...), admin: dict = Depends(get_current_admin)):
+    if not ObjectId.is_valid(car_id):
+        raise HTTPException(status_code=404, detail="Car not found")
+    if status not in ("available", "sold"):
+        raise HTTPException(status_code=400, detail="Invalid status")
+    await db.cars.update_one({"_id": ObjectId(car_id)}, {"$set": {"status": status}})
+    doc = await db.cars.find_one({"_id": ObjectId(car_id)})
+    if not doc:
+        raise HTTPException(status_code=404, detail="Car not found")
+    return Car.from_mongo(doc)
 
 
 # ---------------------------------------------------------------------------

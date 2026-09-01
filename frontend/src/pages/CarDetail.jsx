@@ -46,10 +46,15 @@ export default function CarDetail() {
       <div className="grid lg:grid-cols-3 gap-10">
         {/* Gallery — bento: large main + thumb grid */}
         <div className="lg:col-span-2">
-          <div className="aspect-[16/10] rounded-lg overflow-hidden bg-[#1A1A1A] border border-[#2B2B2B]">
+          <div className="aspect-[16/10] rounded-lg overflow-hidden bg-[#1A1A1A] border border-[#2B2B2B] relative">
             <img src={images[active]} alt={car.title} data-testid="gallery-main"
-              className="w-full h-full object-cover"
+              className={`w-full h-full object-cover ${car.status === "sold" ? "grayscale-[0.5] opacity-75" : ""}`}
               onError={(e) => { e.currentTarget.src = PLACEHOLDER; }} />
+            {car.status === "sold" && (
+              <span className="absolute top-4 right-4 text-xs font-bold tracking-[0.15em] uppercase bg-[#FF3B30] text-white px-3.5 py-1.5 rounded-sm shadow-lg">
+                Sold
+              </span>
+            )}
           </div>
           {images.length > 1 && (
             <div className="mt-4 grid grid-cols-4 sm:grid-cols-6 gap-3" data-testid="gallery-thumbs">
@@ -84,7 +89,12 @@ export default function CarDetail() {
 
         {/* Sticky info */}
         <div className="lg:sticky lg:top-24 h-fit">
-          {car.featured && <span className="text-[0.6rem] font-bold tracking-[0.15em] uppercase bg-[#C5A880] text-[#050505] px-2.5 py-1 rounded-sm">Featured</span>}
+          <div className="flex items-center gap-2">
+            {car.status === "sold"
+              ? <span className="text-[0.6rem] font-bold tracking-[0.15em] uppercase bg-[#FF3B30] text-white px-2.5 py-1 rounded-sm">Sold</span>
+              : <span className="text-[0.6rem] font-bold tracking-[0.15em] uppercase bg-[#1E9E5A] text-white px-2.5 py-1 rounded-sm">Available</span>}
+            {car.featured && <span className="text-[0.6rem] font-bold tracking-[0.15em] uppercase bg-[#C5A880] text-[#050505] px-2.5 py-1 rounded-sm">Featured</span>}
+          </div>
           <h1 className="font-heading text-2xl sm:text-3xl tracking-tight font-light mt-3 leading-tight">{car.title}</h1>
           <p className="font-mono font-semibold text-4xl text-[#C5A880] my-5">{euro(car.price)}</p>
 

@@ -25,6 +25,15 @@ export default function Listings() {
     } catch { toast.error("Failed to delete"); }
   };
 
+  const toggleStatus = async (id, current) => {
+    const next = current === "sold" ? "available" : "sold";
+    try {
+      await api.patch(`/cars/${id}/status?status=${next}`);
+      setCars((p) => p.map((c) => (c.id === id ? { ...c, status: next } : c)));
+      toast.success(next === "sold" ? "Marked as sold" : "Marked as available");
+    } catch { toast.error("Failed to update status"); }
+  };
+
   return (
     <div data-testid="admin-listings">
       <div className="flex items-center justify-between mb-8">
@@ -51,6 +60,7 @@ export default function Listings() {
               <tr>
                 <th className="px-4 py-3 overline text-[#888]">Vehicle</th>
                 <th className="px-4 py-3 overline text-[#888]">Price</th>
+                <th className="px-4 py-3 overline text-[#888]">Status</th>
                 <th className="px-4 py-3 overline text-[#888] hidden md:table-cell">Mileage</th>
                 <th className="px-4 py-3 overline text-[#888] hidden md:table-cell">Photos</th>
                 <th className="px-4 py-3 overline text-[#888] text-right">Actions</th>
@@ -72,6 +82,13 @@ export default function Listings() {
                     </div>
                   </td>
                   <td className="px-4 py-3 font-mono font-semibold text-[#C5A880]">{euro(c.price)}</td>
+                  <td className="px-4 py-3">
+                    <button onClick={() => toggleStatus(c.id, c.status)} data-testid={`status-toggle-${c.id}`}
+                      title="Click to toggle available / sold"
+                      className={`text-[0.65rem] font-bold tracking-[0.1em] uppercase px-2.5 py-1 rounded-sm transition-colors ${c.status === "sold" ? "bg-[#FF3B30]/15 text-[#FF3B30] hover:bg-[#FF3B30]/25" : "bg-[#1E9E5A]/15 text-[#3FD07E] hover:bg-[#1E9E5A]/25"}`}>
+                      {c.status === "sold" ? "Sold" : "Available"}
+                    </button>
+                  </td>
                   <td className="px-4 py-3 hidden md:table-cell text-[#888] font-mono">{km(c.mileage)}</td>
                   <td className="px-4 py-3 hidden md:table-cell text-[#888]">{c.images?.length || 0}</td>
                   <td className="px-4 py-3">

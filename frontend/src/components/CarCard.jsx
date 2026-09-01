@@ -5,6 +5,7 @@ import { PLACEHOLDER } from "../lib/data";
 
 export default function CarCard({ car, index = 0 }) {
   const cover = car.images?.[0] ? imageUrl(car.images[0]) : PLACEHOLDER;
+  const isSold = car.status === "sold";
   return (
     <Link
       to={`/cars/${car.id}`}
@@ -14,10 +15,15 @@ export default function CarCard({ car, index = 0 }) {
     >
       <div className="relative aspect-[16/11] bg-[#1A1A1A] overflow-hidden">
         <img src={cover} alt={car.title} loading="lazy"
-          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.06]"
+          className={`w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.06] ${isSold ? "grayscale-[0.55] opacity-70" : ""}`}
           onError={(e) => { e.currentTarget.src = PLACEHOLDER; }} />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
-        {car.featured && (
+        {isSold && (
+          <span className="absolute top-3.5 right-3.5 text-[0.6rem] font-bold tracking-[0.15em] uppercase bg-[#FF3B30] text-white px-2.5 py-1 rounded-sm shadow-lg z-10">
+            Sold
+          </span>
+        )}
+        {car.featured && !isSold && (
           <span className="absolute top-3.5 left-3.5 text-[0.6rem] font-bold tracking-[0.15em] uppercase bg-[#C5A880] text-[#050505] px-2.5 py-1 rounded-sm">
             Featured
           </span>

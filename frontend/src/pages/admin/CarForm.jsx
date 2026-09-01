@@ -9,7 +9,7 @@ import { MAKES, COUNTIES, FUEL_TYPES, TRANSMISSIONS, BODY_TYPES } from "../../li
 const empty = {
   title: "", make: "", model: "", year: new Date().getFullYear(), price: "", mileage: "",
   fuelType: "Petrol", transmission: "Manual", engineSize: "", bodyType: "", colour: "",
-  doors: 4, county: "", description: "", features: [], images: [], featured: false,
+  doors: 4, county: "", description: "", features: [], images: [], featured: false, status: "available",
 };
 
 const inputCls = "w-full h-10 px-3 rounded-sm border border-[#2B2B2B] bg-[#121212] text-sm text-[#F9F9F9] focus:outline-none focus:ring-1 focus:ring-[#C5A880] focus:border-[#C5A880] transition-colors";
@@ -116,6 +116,12 @@ export default function CarForm() {
               <select className={inputCls} value={form.bodyType} onChange={(e) => set("bodyType", e.target.value)} data-testid="car-body">
                 <option value="">Select</option>
                 {BODY_TYPES.map((b) => <option key={b} value={b}>{b}</option>)}
+              </select>
+            </Field>
+            <Field label="Status">
+              <select className={inputCls} value={form.status} onChange={(e) => set("status", e.target.value)} data-testid="car-status">
+                <option value="available">Available</option>
+                <option value="sold">Sold</option>
               </select>
             </Field>
           </div>

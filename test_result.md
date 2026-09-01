@@ -101,3 +101,51 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+user_problem_statement: "Add a status badge (Available / Sold) to cars, editable through the admin panel, so visitors can see which cars are sold vs available."
+
+backend:
+  - task: "Car status field (available/sold) + PATCH /api/cars/{id}/status endpoint"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        -working: "NA"
+        -agent: "main"
+        -comment: "Added status field (default 'available') to CarBase so it flows through create/update. Added PATCH /api/cars/{id}/status?status=available|sold (admin-only, validates value). Also recreated missing backend/.env (MONGO_URL, DB_NAME, JWT_SECRET, EMERGENT_LLM_KEY, ADMIN creds). Need to verify: cars return status field, create/update persists status, PATCH toggles and rejects invalid values, PATCH requires auth."
+        -working: true
+        -agent: "testing"
+        -comment: "✅ ALL 8 TEST SCENARIOS PASSED. Verified: (1) GET /api/cars returns status field for all cars with valid id; (2) GET /api/cars/{id} includes status; (3a) POST without status defaults to 'available'; (3b) POST with status='sold' persists correctly; (4) PUT updates status successfully; (5) PATCH toggles between sold/available; (6) PATCH with invalid status returns 400; (7) PATCH without auth returns 401; (8) PATCH with nonexistent ID returns 404. All seeded cars have status='available'. Test cars created and cleaned up successfully."
+
+frontend:
+  - task: "Status badge on public cards/detail + admin toggle & form select"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/pages/admin/Listings.jsx, frontend/src/components/CarCard.jsx, frontend/src/pages/CarDetail.jsx, frontend/src/pages/admin/CarForm.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        -working: "NA"
+        -agent: "main"
+        -comment: "SOLD badge overlay on CarCard + CarDetail; Available/Sold pill in admin Listings table with one-click toggle; status dropdown in Add/Edit car form. Not yet tested by frontend agent (awaiting user permission)."
+
+metadata:
+  created_by: "main_agent"
+  version: "1.0"
+  test_sequence: 1
+  run_ui: false
+
+test_plan:
+  current_focus: []
+  stuck_tasks: []
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+    -agent: "main"
+    -message: "Recreated missing .env files (env was reset). Implemented car status feature. Please test backend: GET /api/cars includes status; POST/PUT persist status; PATCH /api/cars/{id}/status toggles available<->sold, rejects invalid values with 400, requires admin auth (401 without). Admin login: admin@hamoudecartrade.ie / Admin@12345."
+    -agent: "testing"
+    -message: "Backend testing complete. All 8 test scenarios PASSED with no issues. The car status feature is fully functional: status field defaults to 'available', persists correctly on create/update, PATCH endpoint toggles status properly, validates input (400 for invalid), enforces auth (401 without), and handles missing resources (404). Ready for frontend integration testing (awaiting user permission)."
